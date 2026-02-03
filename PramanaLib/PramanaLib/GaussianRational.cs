@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace PramanaLib;
 
@@ -8,7 +9,12 @@ namespace PramanaLib;
 /// Represents a complex number as a/b + (c/d)*i where a,b,c,d are BigIntegers.
 /// Stored as a normalized vector <a,b,c,d> with fractions in lowest terms.
 /// </summary>
-public readonly struct GaussianRational : IEquatable<GaussianRational>
+[Serializable]
+public readonly struct GaussianRational :
+    IEquatable<GaussianRational>,
+    IComparable<GaussianRational>,
+    IComparable,
+    IFormattable
 {
     private static readonly Guid PramanaNamespace = new("a6613321-e9f6-4348-8f8b-29d2a3c86349");
 
@@ -538,6 +544,176 @@ public readonly struct GaussianRational : IEquatable<GaussianRational>
     /// </summary>
     public static GaussianRational One => new(1, 1, 0, 1);
 
+    /// <summary>
+    /// Negative one.
+    /// </summary>
+    public static GaussianRational MinusOne => new(-1, 1, 0, 1);
+
+    /// <summary>
+    /// Modulo operation for real GaussianRationals.
+    /// </summary>
+    public static GaussianRational operator %(GaussianRational left, GaussianRational right)
+    {
+        if (!left.IsReal || !right.IsReal)
+            throw new InvalidOperationException("Modulo operation only supported for real numbers");
+        if (right.A == 0)
+            throw new DivideByZeroException("Cannot compute modulo with zero divisor");
+
+        // (a/b) % (c/d) = ((a*d) % (c*b)) / (b*d)
+        var num = (left.A * right.B) % (right.A * left.B);
+        var den = left.B * right.B;
+        return new GaussianRational(num, den, 0, 1);
+    }
+
+    /// <summary>
+    /// Returns the absolute value (magnitude) as a GaussianRational.
+    /// For real numbers, returns the absolute value exactly.
+    /// For complex numbers, returns the magnitude squared (use Magnitude property for double).
+    /// </summary>
+    public static GaussianRational Abs(GaussianRational value)
+    {
+        if (value.IsReal)
+        {
+            return value.A >= 0 ? value : -value;
+        }
+        // For complex, return magnitude squared to stay in rationals
+        return value.MagnitudeSquared;
+    }
+
+    /// <summary>
+    /// Returns the sign of the real part: -1, 0, or 1.
+    /// </summary>
+    public static int Sign(GaussianRational value)
+    {
+        return value.A.Sign;
+    }
+
+    /// <summary>
+    /// Returns the floor of the real part (largest integer <= real part).
+    /// Only valid for real GaussianRationals.
+    /// </summary>
+    public static GaussianRational Floor(GaussianRational value)
+    {
+        if (!value.IsReal)
+            throw new InvalidOperationException("Floor only supported for real numbers");
+
+        // Floor of a/b
+        if (value.B == 1) return value;
+        var floor = value.A / value.B;
+        if (value.A < 0 && value.A % value.B != 0)
+            floor--;
+        return new GaussianRational(floor);
+    }
+
+    /// <summary>
+    /// Returns the ceiling of the real part (smallest integer >= real part).
+    /// Only valid for real GaussianRationals.
+    /// </summary>
+    public static GaussianRational Ceiling(GaussianRational value)
+    {
+        if (!value.IsReal)
+            throw new InvalidOperationException("Ceiling only supported for real numbers");
+
+        if (value.B == 1) return value;
+        var ceil = value.A / value.B;
+        if (value.A > 0 && value.A % value.B != 0)
+            ceil++;
+        return new GaussianRational(ceil);
+    }
+
+    /// <summary>
+    /// Returns the truncated integer part (rounds toward zero).
+    /// Only valid for real GaussianRationals.
+    /// </summary>
+    public static GaussianRational Truncate(GaussianRational value)
+    {
+        if (!value.IsReal)
+            throw new InvalidOperationException("Truncate only supported for real numbers");
+
+        return new GaussianRational(value.A / value.B);
+    }
+
+    /// <summary>
+    /// Raises the GaussianRational to an integer power.
+    /// </summary>
+    public static GaussianRational Pow(GaussianRational baseValue, int exponent)
+    {
+        if (exponent == 0) return One;
+        if (exponent == 1) return baseValue;
+
+        if (exponent < 0)
+        {
+            baseValue = One / baseValue;
+            exponent = -exponent;
+        }
+
+        var result = One;
+        var current = baseValue;
+
+        while (exponent > 0)
+        {
+            if ((exponent & 1) == 1)
+                result *= current;
+            current *= current;
+            exponent >>= 1;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Returns the minimum of two GaussianRationals (compared by real part).
+    /// </summary>
+    public static GaussianRational Min(GaussianRational a, GaussianRational b)
+    {
+        return a <= b ? a : b;
+    }
+
+    /// <summary>
+    /// Returns the maximum of two GaussianRationals (compared by real part).
+    /// </summary>
+    public static GaussianRational Max(GaussianRational a, GaussianRational b)
+    {
+        return a >= b ? a : b;
+    }
+
+    /// <summary>
+    /// Clamps the value between min and max (compared by real part).
+    /// </summary>
+    public static GaussianRational Clamp(GaussianRational value, GaussianRational min, GaussianRational max)
+    {
+        if (min > max)
+            throw new ArgumentException("min must be less than or equal to max");
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    }
+
+    /// <summary>
+    /// Returns the reciprocal (1/z).
+    /// </summary>
+    public GaussianRational Reciprocal => One / this;
+
+    /// <summary>
+    /// Returns true if this value is zero.
+    /// </summary>
+    public bool IsZero => A == 0 && C == 0;
+
+    /// <summary>
+    /// Returns true if this value is one.
+    /// </summary>
+    public bool IsOne => A == 1 && B == 1 && C == 0;
+
+    /// <summary>
+    /// Returns true if this is a negative real number.
+    /// </summary>
+    public bool IsNegative => IsReal && A < 0;
+
+    /// <summary>
+    /// Returns true if this is a positive real number.
+    /// </summary>
+    public bool IsPositive => IsReal && A > 0;
+
     #endregion
 
     #region Equality
@@ -559,6 +735,88 @@ public readonly struct GaussianRational : IEquatable<GaussianRational>
 
     public static bool operator ==(GaussianRational left, GaussianRational right) => left.Equals(right);
     public static bool operator !=(GaussianRational left, GaussianRational right) => !left.Equals(right);
+
+    #endregion
+
+    #region Comparison
+
+    /// <summary>
+    /// Compares based on the real part (a/b). For complex numbers with equal real parts,
+    /// compares by imaginary part.
+    /// </summary>
+    public int CompareTo(GaussianRational other)
+    {
+        // Compare real parts: a/b vs e/f  =>  a*f vs e*b
+        var realCompare = (A * other.B).CompareTo(other.A * B);
+        if (realCompare != 0) return realCompare;
+
+        // If real parts equal, compare imaginary parts: c/d vs g/h  =>  c*h vs g*d
+        return (C * other.D).CompareTo(other.C * D);
+    }
+
+    public int CompareTo(object? obj)
+    {
+        if (obj is null) return 1;
+        if (obj is GaussianRational other) return CompareTo(other);
+        throw new ArgumentException($"Object must be of type {nameof(GaussianRational)}");
+    }
+
+    public static bool operator <(GaussianRational left, GaussianRational right) => left.CompareTo(right) < 0;
+    public static bool operator >(GaussianRational left, GaussianRational right) => left.CompareTo(right) > 0;
+    public static bool operator <=(GaussianRational left, GaussianRational right) => left.CompareTo(right) <= 0;
+    public static bool operator >=(GaussianRational left, GaussianRational right) => left.CompareTo(right) >= 0;
+
+    #endregion
+
+    #region IFormattable
+
+    /// <summary>
+    /// Formats the GaussianRational using the specified format.
+    /// Supported formats:
+    /// - "G" or null: Default human-readable format (e.g., "1 & 1/2 + 3i")
+    /// - "R": Raw vector format (e.g., "<3,2,3,1>")
+    /// - "D" or "F": Decimal format (e.g., "1.5 + 3i")
+    /// - "I": Improper fraction format (e.g., "3/2 + 3i")
+    /// </summary>
+    public string ToString(string? format, IFormatProvider? formatProvider = null)
+    {
+        if (string.IsNullOrEmpty(format)) format = "G";
+
+        return format.ToUpperInvariant() switch
+        {
+            "G" => ToString(),
+            "R" => ToRawString(),
+            "D" or "F" => ToDecimalString(),
+            "I" => ToImproperFractionString(),
+            _ => throw new FormatException($"The '{format}' format string is not supported.")
+        };
+    }
+
+    /// <summary>
+    /// Returns improper fraction format (e.g., "3/2" instead of "1 & 1/2").
+    /// </summary>
+    public string ToImproperFractionString()
+    {
+        string realPart = B == 1 ? A.ToString() : $"{A}/{B}";
+        string imagPart = FormatImaginaryImproper(C, D);
+
+        if (C == 0) return realPart;
+        if (A == 0) return imagPart;
+
+        if (C > 0)
+            return $"{realPart} + {imagPart}";
+        else
+            return $"{realPart} - {FormatImaginaryImproper(-C, D)}";
+    }
+
+    private static string FormatImaginaryImproper(BigInteger num, BigInteger den)
+    {
+        if (num == 0) return "0";
+        if (num == 1 && den == 1) return "i";
+        if (num == -1 && den == 1) return "-i";
+        if (den == 1) return $"{num}i";
+        return $"{num}/{den} i";
+    }
 
     #endregion
 
