@@ -149,7 +149,25 @@ public readonly struct GaussianRational : IEquatable<GaussianRational>
     private static string FormatRational(BigInteger num, BigInteger den)
     {
         if (den == 1) return num.ToString();
-        return $"{num}/{den}";
+
+        // Use mixed fraction format: "1 & 1/2" instead of "3/2"
+        BigInteger whole = num / den;
+        BigInteger remainder = BigInteger.Abs(num % den);
+
+        if (whole == 0)
+        {
+            // Proper fraction only (e.g., "1/2" or "-1/2")
+            return $"{num}/{den}";
+        }
+
+        if (remainder == 0)
+        {
+            // Whole number
+            return whole.ToString();
+        }
+
+        // Mixed fraction (e.g., "1 & 1/2" or "-1 & 1/2")
+        return $"{whole} & {remainder}/{den}";
     }
 
     private static string FormatImaginary(BigInteger num, BigInteger den)
@@ -158,7 +176,25 @@ public readonly struct GaussianRational : IEquatable<GaussianRational>
         if (num == 1 && den == 1) return "i";
         if (num == -1 && den == 1) return "-i";
         if (den == 1) return $"{num}i";
-        return $"{num}/{den} i";
+
+        // Use mixed fraction format for imaginary part
+        BigInteger whole = num / den;
+        BigInteger remainder = BigInteger.Abs(num % den);
+
+        if (whole == 0)
+        {
+            // Proper fraction only
+            return $"{num}/{den} i";
+        }
+
+        if (remainder == 0)
+        {
+            // Whole number
+            return $"{whole}i";
+        }
+
+        // Mixed fraction
+        return $"{whole} & {remainder}/{den} i";
     }
 
     #endregion
@@ -341,6 +377,16 @@ public readonly struct GaussianRational : IEquatable<GaussianRational>
     public static GaussianRational operator -(GaussianRational value)
     {
         return new GaussianRational(-value.A, value.B, -value.C, value.D);
+    }
+
+    public static GaussianRational operator ++(GaussianRational value)
+    {
+        return value + One;
+    }
+
+    public static GaussianRational operator --(GaussianRational value)
+    {
+        return value - One;
     }
 
     public static GaussianRational operator *(GaussianRational left, GaussianRational right)

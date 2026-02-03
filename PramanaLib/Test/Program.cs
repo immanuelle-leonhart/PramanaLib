@@ -21,6 +21,13 @@ while (j <= 100)
     j++;
 }
 
+GaussianRational g2 = 5;
+g2 += 5;
+Console.WriteLine(g2++);
+Console.WriteLine(g2--);
+Console.WriteLine(g2);
+
+
 //Console.WriteLine("=== GaussianRational Testing ===\n");
 
 //// Test integer casting
