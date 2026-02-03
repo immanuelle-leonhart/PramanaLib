@@ -2,30 +2,17 @@ using PramanaLib;
 using System.Numerics;
 
 
-int i = 0;
+GaussianRational i = 1;
+GaussianRational h = 100;
+Console.WriteLine(i + h);
+//while (i <= h)
+//{
+//    Console.WriteLine(i);
+//    GaussianRational g = i;
+//    Console.WriteLine(g);
+//    i++;
+//}
 
-while (i <= 100)
-{
-    Console.WriteLine(i);
-    GaussianRational g = i;
-    Console.WriteLine(g);
-    i++;
-}
-double j = 0.5;
-
-while (j <= 100)
-{
-    Console.WriteLine(j);
-    GaussianRational g = j;
-    Console.WriteLine(g);
-    j++;
-}
-
-GaussianRational g2 = 5;
-g2 += 5;
-Console.WriteLine(g2++);
-Console.WriteLine(g2--);
-Console.WriteLine(g2);
 
 
 //Console.WriteLine("=== GaussianRational Testing ===\n");
