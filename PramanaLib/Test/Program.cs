@@ -2,9 +2,28 @@ using PramanaLib;
 using System.Numerics;
 
 
-GaussianRational i = 1;
-GaussianRational h = 100;
-Console.WriteLine(i + h);
+int p = 1;
+int n = -1;
+int z = 0;
+
+Console.WriteLine("1 * 1 = " + p * p);
+
+Console.WriteLine("1 * -1 = " + p * n);
+Console.WriteLine("-1 * -1 = " + n * n);
+
+GaussianRational i = new GaussianRational(0, 1, 1, 1);
+
+Console.WriteLine("i * i = " + i * i);
+
+
+GaussianRational ni = new GaussianRational(0, 1, -1, 1);
+
+Console.WriteLine("-i * -i = " + ni * ni);
+
+
+//GaussianRational i = 1;
+//GaussianRational h = 100;
+//Console.WriteLine(i + h);
 //while (i <= h)
 //{
 //    Console.WriteLine(i);
