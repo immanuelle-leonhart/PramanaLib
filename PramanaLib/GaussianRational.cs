@@ -42,7 +42,7 @@ public readonly struct GaussianRational :
     /// <summary>
     /// Creates a real GaussianRational (imaginary part = 0).
     /// </summary>
-    public GaussianRational(BigInteger a, BigInteger b) : this(a, b, 0, 1) { }
+    public GaussianRational(BigInteger real, BigInteger imaginary) : this(real, 1, imaginary, 1) { }
 
     /// <summary>
     /// Creates an integer GaussianRational.
@@ -139,17 +139,7 @@ public readonly struct GaussianRational :
     /// </summary>
     public string ToDecimalString(int precision = 15)
     {
-        double real = (double)A / (double)B;
-        double imag = (double)C / (double)D;
-        string format = $"G{precision}";
-
-        if (Math.Abs(imag) < double.Epsilon)
-            return real.ToString(format);
-        if (Math.Abs(real) < double.Epsilon)
-            return $"{imag.ToString(format)}i";
-
-        string sign = imag >= 0 ? "+" : "-";
-        return $"{real.ToString(format)} {sign} {Math.Abs(imag).ToString(format)}i";
+        throw new NotSupportedException("ToDecimalString loses precision. Use ToString() for exact representation.");
     }
 
     private static string FormatRational(BigInteger num, BigInteger den)
@@ -472,31 +462,24 @@ public readonly struct GaussianRational :
     /// <summary>
     /// Gets the magnitude (|z|) as a double.
     /// </summary>
-    public double Magnitude => Math.Sqrt((double)MagnitudeSquared.A / (double)MagnitudeSquared.B);
+    public double Magnitude => throw new NotSupportedException("Magnitude loses precision. Use MagnitudeSquared for exact representation.");
 
     /// <summary>
     /// Gets the phase angle (argument) in radians.
     /// </summary>
-    public double Phase => Math.Atan2((double)C / (double)D, (double)A / (double)B);
+    public double Phase => throw new NotSupportedException("Phase loses precision and cannot be exactly represented as a rational.");
 
     /// <summary>
     /// Gets the polar form as (magnitude, phase).
     /// </summary>
-    public (double Magnitude, double Phase) ToPolar() => (Magnitude, Phase);
+    public (double Magnitude, double Phase) ToPolar() => throw new NotSupportedException("ToPolar loses precision. Polar form cannot be exactly represented as rationals.");
 
     /// <summary>
     /// Creates a GaussianRational from polar coordinates.
-    /// Note: Result may not be exactly representable as rational.
     /// </summary>
     public static GaussianRational FromPolar(double magnitude, double phase)
     {
-        double real = magnitude * Math.Cos(phase);
-        double imag = magnitude * Math.Sin(phase);
-
-        var (realNum, realDen) = DoubleToFraction(real);
-        var (imagNum, imagDen) = DoubleToFraction(imag);
-
-        return new GaussianRational(realNum, realDen, imagNum, imagDen);
+        throw new NotSupportedException("FromPolar loses precision. Polar coordinates cannot be exactly converted to rationals.");
     }
 
     /// <summary>
@@ -786,7 +769,7 @@ public readonly struct GaussianRational :
         {
             "G" => ToString(),
             "R" => ToRawString(),
-            "D" or "F" => ToDecimalString(),
+            "D" or "F" => throw new NotSupportedException("Decimal format loses precision. Use 'G' for exact representation."),
             "I" => ToImproperFractionString(),
             _ => throw new FormatException($"The '{format}' format string is not supported.")
         };
