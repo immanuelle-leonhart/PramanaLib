@@ -11,12 +11,25 @@ Console.WriteLine("1 * 1 = " + p * p);
 Console.WriteLine("1 * -1 = " + p * n);
 Console.WriteLine("-1 * -1 = " + n * n);
 
+
+GaussianRational pn = new GaussianRational(0, 1);
+
 GaussianRational i = new GaussianRational(0, 1, 1, 1);
 
 Console.WriteLine("i * i = " + i * i);
 
+Console.WriteLine(i);
+Console.WriteLine(i++);
+
+
+Console.WriteLine(i++);
+Console.WriteLine(i++);
+Console.WriteLine(i++);
+Console.WriteLine(i++);
 
 GaussianRational ni = new GaussianRational(0, 1, -1, 1);
+
+Console.WriteLine(ni);
 
 Console.WriteLine("-i * -i = " + ni * ni);
 
