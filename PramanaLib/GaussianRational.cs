@@ -6,9 +6,34 @@ using System.Text.Json.Serialization;
 namespace PramanaLib;
 
 /// <summary>
-/// Represents a complex number as a/b + (c/d)*i where a,b,c,d are BigIntegers.
-/// Stored as a normalized vector <a,b,c,d> with fractions in lowest terms.
+/// Represents a Gaussian rational number — a complex number whose real and imaginary
+/// parts are both rational numbers. Internally stored as the normalized vector
+/// &lt;A, B, C, D&gt; representing the value A/B + (C/D)i, where A, B, C, D are
+/// <see cref="BigInteger"/> values and all fractions are kept in lowest terms with
+/// positive denominators.
+/// <para>
+/// This type is an immutable value type (readonly struct) designed for exact arithmetic
+/// without floating-point precision loss. Methods that would produce irrational results
+/// (e.g. <see cref="Magnitude"/>, <see cref="Phase"/>) throw
+/// <see cref="NotSupportedException"/> by design.
+/// </para>
+/// <para>
+/// Each distinct value is assigned a deterministic UUID v5 identifier via
+/// <see cref="PramanaId"/>, derived from its canonical representation.
+/// </para>
 /// </summary>
+/// <remarks>
+/// <list type="bullet">
+///   <item>Supports implicit conversion from <see cref="int"/>, <see cref="long"/>,
+///     <see cref="BigInteger"/>, <see cref="float"/>, <see cref="double"/>, and
+///     <see cref="decimal"/>.</item>
+///   <item>Supports explicit conversion to <see cref="int"/>, <see cref="long"/>,
+///     <see cref="BigInteger"/>, <see cref="float"/>, <see cref="double"/>,
+///     <see cref="decimal"/>, and array types.</item>
+///   <item>Implements full arithmetic (+, -, *, /, %), comparison, equality,
+///     <see cref="IFormattable"/>, and parsing.</item>
+/// </list>
+/// </remarks>
 [Serializable]
 public readonly struct GaussianRational :
     IEquatable<GaussianRational>,
@@ -16,18 +41,35 @@ public readonly struct GaussianRational :
     IComparable,
     IFormattable
 {
+    /// <summary>
+    /// The UUID v5 namespace used to generate <see cref="PramanaId"/> values.
+    /// </summary>
     private static readonly Guid PramanaNamespace = new("a6613321-e9f6-4348-8f8b-29d2a3c86349");
 
-    // Real part = A/B, Imaginary part = C/D
+    /// <summary>Gets the numerator of the real part (A in A/B).</summary>
     public BigInteger A { get; }
+
+    /// <summary>Gets the denominator of the real part (B in A/B). Always positive.</summary>
     public BigInteger B { get; }
+
+    /// <summary>Gets the numerator of the imaginary part (C in C/D).</summary>
     public BigInteger C { get; }
+
+    /// <summary>Gets the denominator of the imaginary part (D in C/D). Always positive.</summary>
     public BigInteger D { get; }
 
     /// <summary>
-    /// Creates a GaussianRational from components a/b + (c/d)*i.
-    /// Automatically normalizes to lowest terms.
+    /// Initializes a new <see cref="GaussianRational"/> representing the value
+    /// <paramref name="a"/>/<paramref name="b"/> + (<paramref name="c"/>/<paramref name="d"/>)i.
+    /// Both fractions are automatically reduced to lowest terms with positive denominators.
     /// </summary>
+    /// <param name="a">Numerator of the real part.</param>
+    /// <param name="b">Denominator of the real part. Must not be zero.</param>
+    /// <param name="c">Numerator of the imaginary part.</param>
+    /// <param name="d">Denominator of the imaginary part. Must not be zero.</param>
+    /// <exception cref="DivideByZeroException">
+    /// Thrown when <paramref name="b"/> or <paramref name="d"/> is zero.
+    /// </exception>
     public GaussianRational(BigInteger a, BigInteger b, BigInteger c, BigInteger d)
     {
         if (b == 0) throw new DivideByZeroException("Real denominator cannot be zero");
@@ -40,15 +82,24 @@ public readonly struct GaussianRational :
     }
 
     /// <summary>
-    /// Creates a real GaussianRational (imaginary part = 0).
+    /// Initializes a new <see cref="GaussianRational"/> from integer real and imaginary parts,
+    /// representing the value <paramref name="real"/> + <paramref name="imaginary"/>*i.
     /// </summary>
+    /// <param name="real">The integer real part.</param>
+    /// <param name="imaginary">The integer imaginary coefficient.</param>
     public GaussianRational(BigInteger real, BigInteger imaginary) : this(real, 1, imaginary, 1) { }
 
     /// <summary>
-    /// Creates an integer GaussianRational.
+    /// Initializes a new <see cref="GaussianRational"/> from a single integer value
+    /// (imaginary part is zero).
     /// </summary>
+    /// <param name="value">The integer value.</param>
     public GaussianRational(BigInteger value) : this(value, 1, 0, 1) { }
 
+    /// <summary>
+    /// Reduces a fraction to lowest terms, ensuring a positive denominator.
+    /// A zero numerator always normalizes to 0/1.
+    /// </summary>
     private static (BigInteger num, BigInteger den) Normalize(BigInteger numerator, BigInteger denominator)
     {
         if (denominator == 0) throw new DivideByZeroException();
@@ -69,15 +120,23 @@ public readonly struct GaussianRational :
     }
 
     /// <summary>
-    /// Gets the PramanaId - a UUIDv5 generated from the canonical string representation.
+    /// Gets a deterministic UUID v5 that uniquely identifies this value.
+    /// Generated by hashing the canonical string "A,B,C,D" under the
+    /// <see cref="PramanaNamespace"/>. Two <see cref="GaussianRational"/> values
+    /// that are mathematically equal will always produce the same ID.
     /// </summary>
     public Guid PramanaId => GenerateUuidV5(PramanaNamespace, $"{A},{B},{C},{D}");
 
     /// <summary>
-    /// Gets the Pramana entity URL for this number.
+    /// Gets the Pramana entity URL for this number, formed as
+    /// <c>https://pramana-data.ca/entity/{PramanaId}</c>.
     /// </summary>
     public string PramanaUrl => $"https://pramana-data.ca/entity/{PramanaId}";
 
+    /// <summary>
+    /// Generates a UUID v5 by SHA-1-hashing <paramref name="name"/> within the given
+    /// <paramref name="namespaceId"/>, per RFC 4122.
+    /// </summary>
     private static Guid GenerateUuidV5(Guid namespaceId, string name)
     {
         byte[] namespaceBytes = namespaceId.ToByteArray();
@@ -102,6 +161,10 @@ public readonly struct GaussianRational :
         return new Guid(result);
     }
 
+    /// <summary>
+    /// Swaps the byte order of the first three components of a GUID byte array
+    /// between little-endian (.NET) and big-endian (UUID spec) representations.
+    /// </summary>
     private static void SwapByteOrder(byte[] guid)
     {
         (guid[0], guid[3]) = (guid[3], guid[0]);
@@ -113,12 +176,15 @@ public readonly struct GaussianRational :
     #region String Representations
 
     /// <summary>
-    /// Returns the raw vector form: <a,b,c,d>
+    /// Returns the internal vector representation as a string in the form
+    /// <c>&lt;A,B,C,D&gt;</c> (e.g. <c>&lt;3,2,1,4&gt;</c> for 3/2 + 1/4 i).
     /// </summary>
     public string ToRawString() => $"<{A},{B},{C},{D}>";
 
     /// <summary>
-    /// Returns human-readable form: "1", "1/2", "1 + i", "1/2 + 1/2 i"
+    /// Returns a human-readable string using mixed-fraction notation.
+    /// <para>Examples: <c>"0"</c>, <c>"1/2"</c>, <c>"1 &amp; 1/2"</c>,
+    /// <c>"3 + 2i"</c>, <c>"1/2 - 1/3 i"</c>.</para>
     /// </summary>
     public override string ToString()
     {
@@ -135,13 +201,21 @@ public readonly struct GaussianRational :
     }
 
     /// <summary>
-    /// Returns decimal form approximation.
+    /// Would return a decimal approximation, but is intentionally disabled because
+    /// decimal representation loses the exact rational precision this type guarantees.
     /// </summary>
+    /// <param name="precision">Unused.</param>
+    /// <exception cref="NotSupportedException">Always thrown.</exception>
     public string ToDecimalString(int precision = 15)
     {
         throw new NotSupportedException("ToDecimalString loses precision. Use ToString() for exact representation.");
     }
 
+    /// <summary>
+    /// Formats a rational number as a mixed fraction string.
+    /// Whole numbers display without a denominator; proper fractions as "n/d";
+    /// improper fractions as "w &amp; r/d" (e.g. "1 &amp; 1/2").
+    /// </summary>
     private static string FormatRational(BigInteger num, BigInteger den)
     {
         if (den == 1) return num.ToString();
@@ -166,6 +240,10 @@ public readonly struct GaussianRational :
         return $"{whole} & {remainder}/{den}";
     }
 
+    /// <summary>
+    /// Formats the imaginary coefficient as a mixed fraction followed by "i".
+    /// Special cases: ±1 renders as "i"/"-i"; zero renders as "0".
+    /// </summary>
     private static string FormatImaginary(BigInteger num, BigInteger den)
     {
         if (num == 0) return "0";
@@ -197,14 +275,40 @@ public readonly struct GaussianRational :
 
     #region Implicit Conversions (FROM other types)
 
+    /// <summary>Implicitly converts an <see cref="int"/> to a real <see cref="GaussianRational"/>.</summary>
     public static implicit operator GaussianRational(int value) => new(value);
+
+    /// <summary>Implicitly converts a <see cref="long"/> to a real <see cref="GaussianRational"/>.</summary>
     public static implicit operator GaussianRational(long value) => new(value);
+
+    /// <summary>Implicitly converts a <see cref="BigInteger"/> to a real <see cref="GaussianRational"/>.</summary>
     public static implicit operator GaussianRational(BigInteger value) => new(value);
 
+    /// <summary>
+    /// Implicitly converts a <see cref="float"/> to a <see cref="GaussianRational"/>
+    /// using a continued-fraction algorithm for the best rational approximation.
+    /// </summary>
     public static implicit operator GaussianRational(float value) => FromDouble(value);
+
+    /// <summary>
+    /// Implicitly converts a <see cref="double"/> to a <see cref="GaussianRational"/>
+    /// using a continued-fraction algorithm for the best rational approximation.
+    /// </summary>
     public static implicit operator GaussianRational(double value) => FromDouble(value);
+
+    /// <summary>
+    /// Implicitly converts a <see cref="decimal"/> to a <see cref="GaussianRational"/>
+    /// by extracting the exact mantissa and scale.
+    /// </summary>
     public static implicit operator GaussianRational(decimal value) => FromDecimal(value);
 
+    /// <summary>
+    /// Converts a <see cref="double"/> to a <see cref="GaussianRational"/> by computing the
+    /// best rational approximation via the continued-fraction algorithm.
+    /// </summary>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> is NaN or Infinity.
+    /// </exception>
     private static GaussianRational FromDouble(double value)
     {
         if (double.IsNaN(value) || double.IsInfinity(value))
@@ -215,6 +319,11 @@ public readonly struct GaussianRational :
         return new GaussianRational(num, den, 0, 1);
     }
 
+    /// <summary>
+    /// Converts a <see cref="decimal"/> to a <see cref="GaussianRational"/> by extracting
+    /// the exact mantissa and power-of-10 scale from the decimal's binary representation.
+    /// This conversion is lossless.
+    /// </summary>
     private static GaussianRational FromDecimal(decimal value)
     {
         // Get the bits of the decimal
@@ -233,6 +342,11 @@ public readonly struct GaussianRational :
         return new GaussianRational(mantissa, denominator, 0, 1);
     }
 
+    /// <summary>
+    /// Computes the best rational approximation of a non-negative <see cref="double"/>
+    /// using the continued-fraction algorithm, stopping when the approximation is within
+    /// a relative tolerance of 1e-15 or after 64 iterations.
+    /// </summary>
     private static (BigInteger num, BigInteger den) DoubleToFraction(double value)
     {
         if (value == 0) return (0, 1);
@@ -275,12 +389,20 @@ public readonly struct GaussianRational :
 
     #region Explicit Conversions (TO other types)
 
+    /// <summary>
+    /// Throws <see cref="InvalidCastException"/> if this value has a non-zero imaginary part.
+    /// Used as a guard for conversions to real numeric types.
+    /// </summary>
     private void ThrowIfNotReal()
     {
         if (C != 0)
             throw new InvalidCastException("Cannot convert complex number with non-zero imaginary part to real number type");
     }
 
+    /// <summary>
+    /// Explicitly converts to <see cref="int"/>. The value must be a real integer.
+    /// </summary>
+    /// <exception cref="InvalidCastException">Thrown if the value has a non-zero imaginary part or is not an integer.</exception>
     public static explicit operator int(GaussianRational gr)
     {
         gr.ThrowIfNotReal();
@@ -289,6 +411,10 @@ public readonly struct GaussianRational :
         return (int)gr.A;
     }
 
+    /// <summary>
+    /// Explicitly converts to <see cref="long"/>. The value must be a real integer.
+    /// </summary>
+    /// <exception cref="InvalidCastException">Thrown if the value has a non-zero imaginary part or is not an integer.</exception>
     public static explicit operator long(GaussianRational gr)
     {
         gr.ThrowIfNotReal();
@@ -297,6 +423,10 @@ public readonly struct GaussianRational :
         return (long)gr.A;
     }
 
+    /// <summary>
+    /// Explicitly converts to <see cref="BigInteger"/>. The value must be a real integer.
+    /// </summary>
+    /// <exception cref="InvalidCastException">Thrown if the value has a non-zero imaginary part or is not an integer.</exception>
     public static explicit operator BigInteger(GaussianRational gr)
     {
         gr.ThrowIfNotReal();
@@ -305,18 +435,33 @@ public readonly struct GaussianRational :
         return gr.A;
     }
 
+    /// <summary>
+    /// Explicitly converts to <see cref="float"/> by dividing numerator by denominator.
+    /// The value must be real; precision may be lost.
+    /// </summary>
+    /// <exception cref="InvalidCastException">Thrown if the value has a non-zero imaginary part.</exception>
     public static explicit operator float(GaussianRational gr)
     {
         gr.ThrowIfNotReal();
         return (float)gr.A / (float)gr.B;
     }
 
+    /// <summary>
+    /// Explicitly converts to <see cref="double"/> by dividing numerator by denominator.
+    /// The value must be real; precision may be lost.
+    /// </summary>
+    /// <exception cref="InvalidCastException">Thrown if the value has a non-zero imaginary part.</exception>
     public static explicit operator double(GaussianRational gr)
     {
         gr.ThrowIfNotReal();
         return (double)gr.A / (double)gr.B;
     }
 
+    /// <summary>
+    /// Explicitly converts to <see cref="decimal"/> by dividing numerator by denominator.
+    /// The value must be real; precision may be lost for very large values.
+    /// </summary>
+    /// <exception cref="InvalidCastException">Thrown if the value has a non-zero imaginary part.</exception>
     public static explicit operator decimal(GaussianRational gr)
     {
         gr.ThrowIfNotReal();
@@ -355,6 +500,10 @@ public readonly struct GaussianRational :
 
     #region Mathematical Operations
 
+    /// <summary>
+    /// Adds two <see cref="GaussianRational"/> values by independently adding their
+    /// real and imaginary rational parts.
+    /// </summary>
     public static GaussianRational operator +(GaussianRational left, GaussianRational right)
     {
         // (a/b + c/d*i) + (e/f + g/h*i) = (a/b + e/f) + (c/d + g/h)*i
@@ -363,6 +512,10 @@ public readonly struct GaussianRational :
         return new GaussianRational(realNum, realDen, imagNum, imagDen);
     }
 
+    /// <summary>
+    /// Subtracts <paramref name="right"/> from <paramref name="left"/> by independently
+    /// subtracting their real and imaginary rational parts.
+    /// </summary>
     public static GaussianRational operator -(GaussianRational left, GaussianRational right)
     {
         var (realNum, realDen) = AddFractions(left.A, left.B, -right.A, right.B);
@@ -370,21 +523,32 @@ public readonly struct GaussianRational :
         return new GaussianRational(realNum, realDen, imagNum, imagDen);
     }
 
+    /// <summary>
+    /// Returns the additive inverse (negation) of the value, negating both real and
+    /// imaginary parts.
+    /// </summary>
     public static GaussianRational operator -(GaussianRational value)
     {
         return new GaussianRational(-value.A, value.B, -value.C, value.D);
     }
 
+    /// <summary>Increments the real part by one.</summary>
     public static GaussianRational operator ++(GaussianRational value)
     {
         return value + One;
     }
 
+    /// <summary>Decrements the real part by one.</summary>
     public static GaussianRational operator --(GaussianRational value)
     {
         return value - One;
     }
 
+    /// <summary>
+    /// Multiplies two <see cref="GaussianRational"/> values using the standard complex
+    /// multiplication formula: (a+bi)(c+di) = (ac−bd) + (ad+bc)i, with all intermediate
+    /// arithmetic performed in exact rational form.
+    /// </summary>
     public static GaussianRational operator *(GaussianRational left, GaussianRational right)
     {
         // (a + bi)(c + di) = (ac - bd) + (ad + bc)i
@@ -403,6 +567,11 @@ public readonly struct GaussianRational :
         return new GaussianRational(realNum, realDen, imagNum, imagDen);
     }
 
+    /// <summary>
+    /// Divides <paramref name="left"/> by <paramref name="right"/> using conjugate
+    /// multiplication: (a+bi)/(c+di) = (a+bi)(c−di) / (c²+d²).
+    /// </summary>
+    /// <exception cref="DivideByZeroException">Thrown when <paramref name="right"/> is zero.</exception>
     public static GaussianRational operator /(GaussianRational left, GaussianRational right)
     {
         // (a + bi)/(c + di) = (a + bi)(c - di) / (c² + d²)
@@ -421,18 +590,22 @@ public readonly struct GaussianRational :
         return new GaussianRational(realNum, realDen, imagNum, imagDen);
     }
 
+    /// <summary>Adds two fractions: a/b + c/d = (ad + bc) / bd.</summary>
     private static (BigInteger num, BigInteger den) AddFractions(BigInteger a, BigInteger b, BigInteger c, BigInteger d)
     {
         // a/b + c/d = (ad + bc) / bd
         return (a * d + b * c, b * d);
     }
 
+    /// <summary>Multiplies two fractions: (a/b) × (c/d) = ac / bd.</summary>
     private static (BigInteger num, BigInteger den) MultiplyFractions(BigInteger a, BigInteger b, BigInteger c, BigInteger d)
     {
         // (a/b) * (c/d) = ac/bd
         return (a * c, b * d);
     }
 
+    /// <summary>Divides two fractions: (a/b) ÷ (c/d) = ad / bc.</summary>
+    /// <exception cref="DivideByZeroException">Thrown when c is zero.</exception>
     private static (BigInteger num, BigInteger den) DivideFractions(BigInteger a, BigInteger b, BigInteger c, BigInteger d)
     {
         // (a/b) / (c/d) = ad/bc
@@ -701,22 +874,32 @@ public readonly struct GaussianRational :
 
     #region Equality
 
+    /// <summary>
+    /// Determines whether this value is equal to another <see cref="GaussianRational"/>.
+    /// Because values are always stored in normalized form, this is a direct comparison
+    /// of all four components.
+    /// </summary>
     public bool Equals(GaussianRational other)
     {
         return A == other.A && B == other.B && C == other.C && D == other.D;
     }
 
+    /// <inheritdoc/>
     public override bool Equals(object? obj)
     {
         return obj is GaussianRational other && Equals(other);
     }
 
+    /// <inheritdoc/>
     public override int GetHashCode()
     {
         return HashCode.Combine(A, B, C, D);
     }
 
+    /// <summary>Returns <see langword="true"/> if the two values are equal.</summary>
     public static bool operator ==(GaussianRational left, GaussianRational right) => left.Equals(right);
+
+    /// <summary>Returns <see langword="true"/> if the two values are not equal.</summary>
     public static bool operator !=(GaussianRational left, GaussianRational right) => !left.Equals(right);
 
     #endregion
@@ -727,6 +910,11 @@ public readonly struct GaussianRational :
     /// Compares based on the real part (a/b). For complex numbers with equal real parts,
     /// compares by imaginary part.
     /// </summary>
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Orders primarily by real part (A/B), breaking ties by imaginary part (C/D).
+    /// Cross-multiplication is used to avoid floating-point arithmetic.
+    /// </remarks>
     public int CompareTo(GaussianRational other)
     {
         // Compare real parts: a/b vs e/f  =>  a*f vs e*b
@@ -737,6 +925,7 @@ public readonly struct GaussianRational :
         return (C * other.D).CompareTo(other.C * D);
     }
 
+    /// <inheritdoc/>
     public int CompareTo(object? obj)
     {
         if (obj is null) return 1;
@@ -744,9 +933,16 @@ public readonly struct GaussianRational :
         throw new ArgumentException($"Object must be of type {nameof(GaussianRational)}");
     }
 
+    /// <summary>Returns <see langword="true"/> if <paramref name="left"/> is less than <paramref name="right"/>.</summary>
     public static bool operator <(GaussianRational left, GaussianRational right) => left.CompareTo(right) < 0;
+
+    /// <summary>Returns <see langword="true"/> if <paramref name="left"/> is greater than <paramref name="right"/>.</summary>
     public static bool operator >(GaussianRational left, GaussianRational right) => left.CompareTo(right) > 0;
+
+    /// <summary>Returns <see langword="true"/> if <paramref name="left"/> is less than or equal to <paramref name="right"/>.</summary>
     public static bool operator <=(GaussianRational left, GaussianRational right) => left.CompareTo(right) <= 0;
+
+    /// <summary>Returns <see langword="true"/> if <paramref name="left"/> is greater than or equal to <paramref name="right"/>.</summary>
     public static bool operator >=(GaussianRational left, GaussianRational right) => left.CompareTo(right) >= 0;
 
     #endregion
@@ -776,7 +972,8 @@ public readonly struct GaussianRational :
     }
 
     /// <summary>
-    /// Returns improper fraction format (e.g., "3/2" instead of "1 & 1/2").
+    /// Returns a string using improper fractions (e.g. <c>"3/2"</c> instead of
+    /// <c>"1 &amp; 1/2"</c>). Useful when mixed-fraction notation is undesirable.
     /// </summary>
     public string ToImproperFractionString()
     {
@@ -792,6 +989,9 @@ public readonly struct GaussianRational :
             return $"{realPart} - {FormatImaginaryImproper(-C, D)}";
     }
 
+    /// <summary>
+    /// Formats the imaginary coefficient as an improper fraction followed by "i".
+    /// </summary>
     private static string FormatImaginaryImproper(BigInteger num, BigInteger den)
     {
         if (num == 0) return "0";
@@ -806,8 +1006,13 @@ public readonly struct GaussianRational :
     #region Parsing
 
     /// <summary>
-    /// Parses from the canonical form "a,b,c,d".
+    /// Parses a <see cref="GaussianRational"/> from the canonical comma-separated form
+    /// <c>"a,b,c,d"</c> (e.g. <c>"3,2,1,4"</c> for the value 3/2 + 1/4 i).
     /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <exception cref="FormatException">
+    /// Thrown if <paramref name="s"/> does not contain exactly four comma-separated integers.
+    /// </exception>
     public static GaussianRational Parse(string s)
     {
         var parts = s.Split(',');
@@ -823,8 +1028,15 @@ public readonly struct GaussianRational :
     }
 
     /// <summary>
-    /// Tries to parse from the canonical form "a,b,c,d".
+    /// Attempts to parse a <see cref="GaussianRational"/> from the canonical form
+    /// <c>"a,b,c,d"</c>. Returns <see langword="false"/> on failure without throwing.
     /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="result">
+    /// When this method returns <see langword="true"/>, contains the parsed value;
+    /// otherwise, <see langword="default"/>.
+    /// </param>
+    /// <returns><see langword="true"/> if parsing succeeded; otherwise <see langword="false"/>.</returns>
     public static bool TryParse(string s, out GaussianRational result)
     {
         result = default;
