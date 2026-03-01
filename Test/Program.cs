@@ -12,9 +12,9 @@ Console.WriteLine("1 * -1 = " + p * n);
 Console.WriteLine("-1 * -1 = " + n * n);
 
 
-GaussianRational pn = new GaussianRational(0, 1);
+Gauss pn = new Gauss(0, 1);
 
-GaussianRational i = new GaussianRational(0, 1, 1, 1);
+Gauss i = new Gauss(0, 1, 1, 1);
 
 Console.WriteLine("i * i = " + i * i);
 
@@ -27,33 +27,33 @@ Console.WriteLine(i++);
 Console.WriteLine(i++);
 Console.WriteLine(i++);
 
-GaussianRational ni = new GaussianRational(0, 1, -1, 1);
+Gauss ni = new Gauss(0, 1, -1, 1);
 
 Console.WriteLine(ni);
 
 Console.WriteLine("-i * -i = " + ni * ni);
 
 
-//GaussianRational i = 1;
-//GaussianRational h = 100;
+//Gauss i = 1;
+//Gauss h = 100;
 //Console.WriteLine(i + h);
 //while (i <= h)
 //{
 //    Console.WriteLine(i);
-//    GaussianRational g = i;
+//    Gauss g = i;
 //    Console.WriteLine(g);
 //    i++;
 //}
 
 
 
-//Console.WriteLine("=== GaussianRational Testing ===\n");
+//Console.WriteLine("=== Gauss Testing ===\n");
 
 //// Test integer casting
 //Console.WriteLine("--- Integer Casting ---");
-//GaussianRational one = 1;
-//GaussianRational five = 5;
-//GaussianRational negThree = -3;
+//Gauss one = 1;
+//Gauss five = 5;
+//Gauss negThree = -3;
 
 //Console.WriteLine($"1 -> {one.ToRawString()} -> \"{one}\"");
 //Console.WriteLine($"5 -> {five.ToRawString()} -> \"{five}\"");
@@ -62,9 +62,9 @@ Console.WriteLine("-i * -i = " + ni * ni);
 
 //// Test double/float casting
 //Console.WriteLine("--- Double/Float Casting ---");
-//GaussianRational half = 0.5;
-//GaussianRational quarter = 0.25;
-//GaussianRational third = 1.0 / 3.0;
+//Gauss half = 0.5;
+//Gauss quarter = 0.25;
+//Gauss third = 1.0 / 3.0;
 
 //Console.WriteLine($"0.5 -> {half.ToRawString()} -> \"{half}\"");
 //Console.WriteLine($"0.25 -> {quarter.ToRawString()} -> \"{quarter}\"");
@@ -73,10 +73,10 @@ Console.WriteLine("-i * -i = " + ni * ni);
 
 //// Test complex numbers
 //Console.WriteLine("--- Complex Numbers ---");
-//var i = GaussianRational.I;
-//var onePlusI = new GaussianRational(1, 1, 1, 1);
-//var twoPlusTwoI = new GaussianRational(2, 1, 2, 1);
-//var halfPlusHalfI = new GaussianRational(1, 2, 1, 2);
+//var i = Gauss.I;
+//var onePlusI = new Gauss(1, 1, 1, 1);
+//var twoPlusTwoI = new Gauss(2, 1, 2, 1);
+//var halfPlusHalfI = new Gauss(1, 2, 1, 2);
 
 //Console.WriteLine($"i -> {i.ToRawString()} -> \"{i}\"");
 //Console.WriteLine($"1+i -> {onePlusI.ToRawString()} -> \"{onePlusI}\"");
@@ -102,16 +102,16 @@ Console.WriteLine("-i * -i = " + ni * ni);
 
 //// Test parsing
 //Console.WriteLine("--- Parsing ---");
-//var parsed = GaussianRational.Parse("1,1,0,1");
+//var parsed = Gauss.Parse("1,1,0,1");
 //Console.WriteLine($"Parse(\"1,1,0,1\") -> {parsed.ToRawString()} -> \"{parsed}\"");
-//var parsed2 = GaussianRational.Parse("1,2,1,2");
+//var parsed2 = Gauss.Parse("1,2,1,2");
 //Console.WriteLine($"Parse(\"1,2,1,2\") -> {parsed2.ToRawString()} -> \"{parsed2}\"");
 //Console.WriteLine();
 
 //// Test arithmetic
 //Console.WriteLine("--- Arithmetic ---");
-//var a = new GaussianRational(3, 1, 2, 1); // 3 + 2i
-//var b = new GaussianRational(1, 1, 4, 1); // 1 + 4i
+//var a = new Gauss(3, 1, 2, 1); // 3 + 2i
+//var b = new Gauss(1, 1, 4, 1); // 1 + 4i
 
 //Console.WriteLine($"a = {a}");
 //Console.WriteLine($"b = {b}");
@@ -133,8 +133,8 @@ Console.WriteLine("-i * -i = " + ni * ni);
 
 //// Test explicit casting back to primitives
 //Console.WriteLine("--- Explicit Casting to Primitives ---");
-//GaussianRational intVal = 42;
-//GaussianRational ratVal = new GaussianRational(7, 2, 0, 1); // 7/2
+//Gauss intVal = 42;
+//Gauss ratVal = new Gauss(7, 2, 0, 1); // 7/2
 
 //Console.WriteLine($"{intVal} as int: {(int)intVal}");
 //Console.WriteLine($"{intVal} as long: {(long)intVal}");
@@ -152,7 +152,7 @@ Console.WriteLine("-i * -i = " + ni * ni);
 //// Test BigInteger support
 //Console.WriteLine("--- BigInteger Support ---");
 //BigInteger big = BigInteger.Pow(10, 50);
-//GaussianRational bigRat = big;
+//Gauss bigRat = big;
 //Console.WriteLine($"10^50 -> {bigRat.ToRawString()}");
 //Console.WriteLine($"IsInteger: {bigRat.IsInteger}");
 //Console.WriteLine();
@@ -170,8 +170,8 @@ Console.WriteLine("-i * -i = " + ni * ni);
 
 //// Test equality
 //Console.WriteLine("--- Equality ---");
-//GaussianRational a1 = 2;
-//GaussianRational a2 = new GaussianRational(4, 2, 0, 1); // 4/2 = 2
+//Gauss a1 = 2;
+//Gauss a2 = new Gauss(4, 2, 0, 1); // 4/2 = 2
 //Console.WriteLine($"{a1.ToRawString()} == {a2.ToRawString()}: {a1 == a2}");
 //Console.WriteLine();
 
