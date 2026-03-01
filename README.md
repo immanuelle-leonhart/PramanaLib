@@ -27,9 +27,9 @@ PramanaLib implements the `num:` pseudo-class as a full C# struct with exact ari
 
 The `date:`, `time:`, `interval:`, `chem:`, and `element:` pseudo-classes are handled in the Pramana web app. They are listed here for reference but do not currently need dedicated C# types — the `num:` pseudo-class is the only one whose semantics (exact rational arithmetic, complex number algebra, number-hierarchy classification) justify a standalone library type.
 
-## GaussianRational
+## GaussianRational (Gauss)
 
-`GaussianRational` is an immutable `readonly struct` representing a Gaussian rational number `a/b + (c/d)i` with arbitrary-precision integer components (`BigInteger`). It is the C# implementation of Pramana's `num:` pseudo-class.
+`GaussianRational` (standard short name: **`Gauss`**) is an immutable `readonly struct` representing a Gaussian rational number `a/b + (c/d)i` with arbitrary-precision integer components (`BigInteger`). It is the C# implementation of Pramana's `num:` pseudo-class. The C# SDK uses `Gauss` as the struct name. When a value is specifically a Gaussian integer (both denominators are 1), it is referred to as a **`Gint`**.
 
 ### Key features
 
@@ -243,6 +243,10 @@ When resolved through Pramana, each `num:` value is automatically classified:
 | `num:-5` | -5 | Integer |
 | `num:3,4` | 3/4 | Rational Number |
 | `num:1,1,1,1` | 1 + i | Gaussian Rational |
+
+## Acknowledgments
+
+The Gauss and Gint implementations across all Pramana SDKs were heavily inspired by [gaussian_integers](https://github.com/alreich/gaussian_integers) by **Alfred J. Reich, Ph.D.**, which provides exact arithmetic for Gaussian integers and Gaussian rationals in Python.
 
 ## Building
 
