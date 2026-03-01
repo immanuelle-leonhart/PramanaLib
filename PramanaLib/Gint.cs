@@ -101,10 +101,16 @@ public readonly struct Gint :
     public string PramanaString => $"pra:num:{Real},1,{Imag},1";
 
     /// <summary>
-    /// Gets the Pramana entity URL for this number, formed as
+    /// Gets the Pramana entity URL using the hashed UUID v5 identifier, formed as
     /// <c>https://pramana-data.ca/entity/{PramanaId}</c>.
     /// </summary>
-    public string PramanaUrl => $"https://pramana-data.ca/entity/{PramanaId}";
+    public string PramanaHashUrl => $"https://pramana-data.ca/entity/{PramanaId}";
+
+    /// <summary>
+    /// Gets the Pramana entity URL using the non-hashed pseudo-class string, formed as
+    /// <c>https://pramana-data.ca/entity/pra:num:x,1,y,1</c>.
+    /// </summary>
+    public string PramanaUrl => $"https://pramana-data.ca/entity/{PramanaString}";
 
     #endregion
 

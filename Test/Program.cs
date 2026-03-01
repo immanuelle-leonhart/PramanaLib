@@ -146,8 +146,10 @@ Console.WriteLine($"Gint(3+2i).PramanaString  = {gi1.PramanaString}");
 Console.WriteLine($"Gauss(3+2i).PramanaId     = {g1.PramanaId}");
 Console.WriteLine($"Gint(3+2i).PramanaId      = {gi1.PramanaId}");
 Console.WriteLine($"IDs match: {g1.PramanaId == gi1.PramanaId}");
-Console.WriteLine($"Gauss(3+2i).PramanaUrl    = {g1.PramanaUrl}");
-Console.WriteLine($"Gint(3+2i).PramanaUrl     = {gi1.PramanaUrl}");
+Console.WriteLine($"Gauss(3+2i).PramanaUrl     = {g1.PramanaUrl}");
+Console.WriteLine($"Gauss(3+2i).PramanaHashUrl = {g1.PramanaHashUrl}");
+Console.WriteLine($"Gint(3+2i).PramanaUrl      = {gi1.PramanaUrl}");
+Console.WriteLine($"Gint(3+2i).PramanaHashUrl  = {gi1.PramanaHashUrl}");
 Console.WriteLine();
 
 Gauss one = Gauss.One;
