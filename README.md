@@ -91,7 +91,7 @@ Console.WriteLine(id);           // always the same UUID for the value 5
 
 // And a canonical Pramana URL
 Console.WriteLine(five.PramanaUrl);
-// https://pramana-data.ca/entity/{uuid}
+// https://pramana.dev/entity/{uuid}
 ```
 
 #### Formatting
@@ -285,4 +285,4 @@ All SDKs implement the same core specification and must produce identical result
 
 ## Relationship to Pramana
 
-This library is a companion to the [Pramana](https://pramana-data.ca) knowledge graph. The Python side defines pseudo-class routing, virtual entity generation, and number classification in `src/combinatoric_classes.py` and `web/app.py`. PramanaLib provides the same canonical normalization and UUID generation in C# so that .NET consumers can work with Pramana values natively.
+This library is a companion to the [Pramana](https://pramana.dev) knowledge graph. The Python side defines pseudo-class routing, virtual entity generation, and number classification in `src/combinatoric_classes.py` and `web/app.py`. PramanaLib provides the same canonical normalization and UUID generation in C# so that .NET consumers can work with Pramana values natively.
