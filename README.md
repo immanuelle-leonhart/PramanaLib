@@ -1,6 +1,6 @@
 # PramanaLib
 
-C# runtime library for [Pramana](https://github.com/Emma-Leonhart/Pramana) pseudo-classes. Provides exact-arithmetic value types that generate deterministic Pramana IDs, staying consistent with the canonical Python implementation in the Pramana knowledge graph.
+C# runtime library for [Pramana](https://pramana.dev) pseudo-classes. Provides exact-arithmetic value types that generate deterministic Pramana IDs, staying consistent with the canonical Python implementation in the Pramana knowledge graph.
 
 ## What is Pramana?
 
@@ -265,4 +265,4 @@ Test/
 
 ## Relationship to Pramana
 
-This library is a companion to the [Pramana](https://github.com/Emma-Leonhart/Pramana) knowledge graph. The Python side defines pseudo-class routing, virtual entity generation, and number classification in `src/combinatoric_classes.py` and `web/app.py`. PramanaLib provides the same canonical normalization and UUID generation in C# so that .NET consumers can work with Pramana values natively.
+This library is a companion to the [Pramana](https://pramana.dev) knowledge graph. The Python side defines pseudo-class routing, virtual entity generation, and number classification in `src/combinatoric_classes.py` and `web/app.py`. PramanaLib provides the same canonical normalization and UUID generation in C# so that .NET consumers can work with Pramana values natively.
