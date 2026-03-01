@@ -87,6 +87,25 @@ public readonly struct Gint :
     /// </summary>
     public bool IsPurelyImaginary => Real == 0 && Imag != 0;
 
+    /// <summary>
+    /// Gets a deterministic UUID v5 that uniquely identifies this value.
+    /// Uses the same namespace and canonical form as <see cref="Gauss.PramanaId"/>,
+    /// with denominators always equal to 1 (i.e. "Real,1,Imag,1").
+    /// </summary>
+    public Guid PramanaId => Gauss.GenerateUuidV5(Gauss.PramanaNamespace, $"{Real},1,{Imag},1");
+
+    /// <summary>
+    /// Gets the canonical Pramana pseudo-class string for this Gaussian integer,
+    /// in the form <c>pra:num:x,1,y,1</c> (e.g. <c>"pra:num:3,1,2,1"</c> for 3+2i).
+    /// </summary>
+    public string PramanaString => $"pra:num:{Real},1,{Imag},1";
+
+    /// <summary>
+    /// Gets the Pramana entity URL for this number, formed as
+    /// <c>https://pramana-data.ca/entity/{PramanaId}</c>.
+    /// </summary>
+    public string PramanaUrl => $"https://pramana-data.ca/entity/{PramanaId}";
+
     #endregion
 
     #region Static Factory Methods

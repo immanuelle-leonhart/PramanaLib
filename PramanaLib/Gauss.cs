@@ -54,7 +54,7 @@ public readonly struct Gauss :
     /// The UUID v5 namespace for the <c>num:</c> pseudo-class, shared with the Pramana
     /// Python codebase (<c>NUM_NAMESPACE</c> in <c>web/app.py</c>).
     /// </summary>
-    private static readonly Guid PramanaNamespace = new("a6613321-e9f6-4348-8f8b-29d2a3c86349");
+    internal static readonly Guid PramanaNamespace = new("a6613321-e9f6-4348-8f8b-29d2a3c86349");
 
     /// <summary>Gets the numerator of the real part (A in A/B).</summary>
     public BigInteger A { get; }
@@ -138,6 +138,13 @@ public readonly struct Gauss :
     public Guid PramanaId => GenerateUuidV5(PramanaNamespace, $"{A},{B},{C},{D}");
 
     /// <summary>
+    /// Gets the canonical Pramana pseudo-class string for this number, in the form
+    /// <c>pra:num:A,B,C,D</c> (e.g. <c>"pra:num:1,1,0,1"</c> for 1,
+    /// <c>"pra:num:3,1,2,1"</c> for 3+2i).
+    /// </summary>
+    public string PramanaString => $"pra:num:{A},{B},{C},{D}";
+
+    /// <summary>
     /// Gets the Pramana entity URL for this number, formed as
     /// <c>https://pramana-data.ca/entity/{PramanaId}</c>.
     /// </summary>
@@ -147,7 +154,7 @@ public readonly struct Gauss :
     /// Generates a UUID v5 by SHA-1-hashing <paramref name="name"/> within the given
     /// <paramref name="namespaceId"/>, per RFC 4122.
     /// </summary>
-    private static Guid GenerateUuidV5(Guid namespaceId, string name)
+    internal static Guid GenerateUuidV5(Guid namespaceId, string name)
     {
         byte[] namespaceBytes = namespaceId.ToByteArray();
         // Convert to big-endian for UUID spec compliance
