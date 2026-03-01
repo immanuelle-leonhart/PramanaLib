@@ -675,7 +675,7 @@ public class GaussTests
     [Fact]
     public void PramanaUrl_UsesNonHashedForm()
     {
-        Assert.Equal("https://pramana-data.ca/entity/pra:num:1,1,0,1", Gauss.One.PramanaUrl);
+        Assert.Equal("https://pramana.dev/entity/pra:num:1,1,0,1", Gauss.One.PramanaUrl);
     }
 
     [Fact]

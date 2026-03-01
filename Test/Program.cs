@@ -160,3 +160,5 @@ Console.WriteLine($"Gauss(1/2).ToDecimalString() = {new Gauss(1, 2, 0, 1).ToDeci
 Console.WriteLine();
 
 Console.WriteLine("=== All Tests Complete ===");
+
+PramanaLib.PramanaObject p = new PramanaLib.PramanaObject();

@@ -7,7 +7,9 @@
       "Bash(gh repo create:*)",
       "Bash(dotnet build:*)",
       "Bash(git push)",
-      "Bash(dotnet run:*)"
+      "Bash(dotnet run:*)",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet:*)"
     ]
   }
 }

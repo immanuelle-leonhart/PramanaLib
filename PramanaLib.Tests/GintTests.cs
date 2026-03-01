@@ -573,7 +573,7 @@ public class GintTests
     public void PramanaUrl_UsesNonHashedForm()
     {
         var g = new Gint(3, 2);
-        Assert.Equal("https://pramana-data.ca/entity/pra:num:3,1,2,1", g.PramanaUrl);
+        Assert.Equal("https://pramana.dev/entity/pra:num:3,1,2,1", g.PramanaUrl);
     }
 
     [Fact]
@@ -581,7 +581,7 @@ public class GintTests
     {
         var g = new Gint(3, 2);
         Assert.Contains(g.PramanaId.ToString(), g.PramanaHashUrl);
-        Assert.StartsWith("https://pramana-data.ca/entity/", g.PramanaHashUrl);
+        Assert.StartsWith("https://pramana.dev/entity/", g.PramanaHashUrl);
     }
 
     #endregion

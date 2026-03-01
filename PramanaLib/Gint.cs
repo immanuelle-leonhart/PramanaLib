@@ -22,7 +22,7 @@ namespace PramanaLib;
 public readonly struct Gint :
     IEquatable<Gint>,
     IComparable<Gint>,
-    IComparable
+    IComparable, IPramanaLinkable
 {
     /// <summary>Gets the real part of this Gaussian integer.</summary>
     public BigInteger Real { get; }
@@ -102,15 +102,15 @@ public readonly struct Gint :
 
     /// <summary>
     /// Gets the Pramana entity URL using the hashed UUID v5 identifier, formed as
-    /// <c>https://pramana-data.ca/entity/{PramanaId}</c>.
+    /// <c>https://pramana.dev/entity/{PramanaId}</c>.
     /// </summary>
-    public string PramanaHashUrl => $"https://pramana-data.ca/entity/{PramanaId}";
+    public string PramanaHashUrl => $"https://pramana.dev/entity/{PramanaId}";
 
     /// <summary>
     /// Gets the Pramana entity URL using the non-hashed pseudo-class string, formed as
-    /// <c>https://pramana-data.ca/entity/pra:num:x,1,y,1</c>.
+    /// <c>https://pramana.dev/entity/pra:num:x,1,y,1</c>.
     /// </summary>
-    public string PramanaUrl => $"https://pramana-data.ca/entity/{PramanaString}";
+    public string PramanaUrl => $"https://pramana.dev/entity/{PramanaString}";
 
     #endregion
 

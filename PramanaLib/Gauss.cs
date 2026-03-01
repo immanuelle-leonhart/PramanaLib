@@ -48,7 +48,7 @@ public readonly struct Gauss :
     IEquatable<Gauss>,
     IComparable<Gauss>,
     IComparable,
-    IFormattable
+    IFormattable, IPramanaLinkable
 {
     /// <summary>
     /// The UUID v5 namespace for the <c>num:</c> pseudo-class, shared with the Pramana
@@ -146,15 +146,15 @@ public readonly struct Gauss :
 
     /// <summary>
     /// Gets the Pramana entity URL using the hashed UUID v5 identifier, formed as
-    /// <c>https://pramana-data.ca/entity/{PramanaId}</c>.
+    /// <c>https://pramana.dev/entity/{PramanaId}</c>.
     /// </summary>
-    public string PramanaHashUrl => $"https://pramana-data.ca/entity/{PramanaId}";
+    public string PramanaHashUrl => $"https://pramana.dev/entity/{PramanaId}";
 
     /// <summary>
     /// Gets the Pramana entity URL using the non-hashed pseudo-class string, formed as
-    /// <c>https://pramana-data.ca/entity/pra:num:A,B,C,D</c>.
+    /// <c>https://pramana.dev/entity/pra:num:A,B,C,D</c>.
     /// </summary>
-    public string PramanaUrl => $"https://pramana-data.ca/entity/{PramanaString}";
+    public string PramanaUrl => $"https://pramana.dev/entity/{PramanaString}";
 
     /// <summary>
     /// Generates a UUID v5 by SHA-1-hashing <paramref name="name"/> within the given
