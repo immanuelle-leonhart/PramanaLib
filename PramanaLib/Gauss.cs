@@ -861,6 +861,58 @@ public readonly struct Gauss :
     public Gauss Reciprocal => One / this;
 
     /// <summary>
+    /// Gets the norm (squared absolute value) as a <see cref="Gauss"/>.
+    /// Equivalent to <see cref="MagnitudeSquared"/> but follows the mathematical convention
+    /// used in Gaussian integer/rational theory.
+    /// </summary>
+    /// <remarks>
+    /// For a Gaussian rational a/b + (c/d)i, the norm is (a/b)² + (c/d)².
+    /// </remarks>
+    public Gauss Norm => MagnitudeSquared;
+
+    /// <summary>
+    /// Gets the multiplicative inverse (1/z).
+    /// Equivalent to <see cref="Reciprocal"/>.
+    /// </summary>
+    public Gauss Inverse => Reciprocal;
+
+    /// <summary>
+    /// Returns the imaginary unit i = Gauss(0, 1, 1, 1).
+    /// </summary>
+    public static Gauss Eye() => I;
+
+    /// <summary>
+    /// Returns the four units of Q[i]: [1, -1, i, -i].
+    /// </summary>
+    public static Gauss[] GaussUnits() => [One, MinusOne, I, -I];
+
+    /// <summary>
+    /// Returns a list of this Gauss's three non-trivial associates (multiplied by -1, i, -i).
+    /// </summary>
+    /// <remarks>
+    /// Two Gaussian rationals are associates if one equals the other times a unit.
+    /// Every nonzero Gaussian rational has exactly four associates (including itself).
+    /// This method returns the three associates that are not equal to this value.
+    /// </remarks>
+    public Gauss[] Associates() => [-this, this * I, this * -I];
+
+    /// <summary>
+    /// Returns true if <paramref name="other"/> is an associate of this Gaussian rational.
+    /// </summary>
+    /// <param name="other">The Gaussian rational to test.</param>
+    public bool IsAssociate(Gauss other)
+    {
+        if (other.IsZero) return IsZero;
+        var q = this / other;
+        // Check if q is a unit (1, -1, i, or -i)
+        foreach (var unit in GaussUnits())
+        {
+            if (q == unit) return true;
+        }
+        return false;
+    }
+
+    /// <summary>
     /// Returns true if this value is zero.
     /// </summary>
     public bool IsZero => A == 0 && C == 0;

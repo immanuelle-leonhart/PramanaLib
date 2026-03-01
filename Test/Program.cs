@@ -1,198 +1,139 @@
 using PramanaLib;
 using System.Numerics;
 
+Console.WriteLine("=== Gint (Gaussian Integer) Testing ===\n");
 
-int p = 1;
-int n = -1;
-int z = 0;
+// Basic construction
+Console.WriteLine("--- Construction ---");
+var alpha = new Gint(11, 3);
+var beta = new Gint(1, 8);
+Console.WriteLine($"alpha = {alpha}");
+Console.WriteLine($"beta = {beta}");
+Console.WriteLine($"Gint() = {new Gint()}");
+Console.WriteLine($"Gint(5) = {new Gint(5)}");
+Console.WriteLine($"Gint.Eye() = {Gint.Eye()}");
+Console.WriteLine($"Gint.Two() = {Gint.Two()}");
+Console.WriteLine();
 
-Console.WriteLine("1 * 1 = " + p * p);
+// Properties
+Console.WriteLine("--- Properties ---");
+Console.WriteLine($"alpha.Real = {alpha.Real}");
+Console.WriteLine($"alpha.Imag = {alpha.Imag}");
+Console.WriteLine($"alpha.Conjugate = {alpha.Conjugate}");
+Console.WriteLine($"alpha.Norm = {alpha.Norm}");
+Console.WriteLine($"alpha.IsUnit = {alpha.IsUnit}");
+Console.WriteLine($"Gint.Eye().IsUnit = {Gint.Eye().IsUnit}");
+Console.WriteLine();
 
-Console.WriteLine("1 * -1 = " + p * n);
-Console.WriteLine("-1 * -1 = " + n * n);
+// Arithmetic
+Console.WriteLine("--- Arithmetic ---");
+Console.WriteLine($"alpha + beta = {alpha + beta}");
+Console.WriteLine($"alpha - beta = {alpha - beta}");
+Console.WriteLine($"alpha * beta = {alpha * beta}");
+Console.WriteLine($"alpha / beta = {alpha / beta}");
+Console.WriteLine($"alpha % beta = {alpha % beta}");
+Console.WriteLine($"-alpha = {-alpha}");
+Console.WriteLine($"Gint.Pow(alpha, 3) = {Gint.Pow(alpha, 3)}");
+Console.WriteLine();
 
+// Units and Associates
+Console.WriteLine("--- Units & Associates ---");
+Console.Write("Units: ");
+foreach (var u in Gint.Units()) Console.Write($"{u}  ");
+Console.WriteLine();
+Console.Write("Associates of alpha: ");
+foreach (var a in alpha.Associates()) Console.Write($"{a}  ");
+Console.WriteLine();
+Console.WriteLine($"alpha.IsAssociate(-alpha) = {alpha.IsAssociate(-alpha)}");
+Console.WriteLine($"alpha.IsAssociate(beta) = {alpha.IsAssociate(beta)}");
+Console.WriteLine();
 
-Gauss pn = new Gauss(0, 1);
+// GCD & Extended GCD
+Console.WriteLine("--- GCD & Extended GCD ---");
+var gcd = Gint.Gcd(alpha, beta);
+Console.WriteLine($"Gint.Gcd({alpha}, {beta}) = {gcd}");
 
-Gauss i = new Gauss(0, 1, 1, 1);
+var (g, x, y) = Gint.Xgcd(alpha, beta);
+Console.WriteLine($"Gint.Xgcd({alpha}, {beta}) = (gcd={g}, x={x}, y={y})");
+Console.WriteLine($"Verify: {alpha}*{x} + {beta}*{y} = {alpha * x + beta * y}");
+Console.WriteLine();
 
-Console.WriteLine("i * i = " + i * i);
+// Modified Divmod
+Console.WriteLine("--- Modified Divmod ---");
+var (q, r) = Gint.ModifiedDivmod(alpha, beta);
+Console.WriteLine($"ModifiedDivmod({alpha}, {beta}) = (q={q}, r={r})");
+Console.WriteLine($"Verify: {beta}*{q} + {r} = {beta * q + r}");
+Console.WriteLine();
 
-Console.WriteLine(i);
-Console.WriteLine(i++);
+// Primality
+Console.WriteLine("--- Gaussian Primality ---");
+Console.WriteLine($"IsGaussianPrime(3) = {Gint.IsGaussianPrime(new Gint(3))}");
+Console.WriteLine($"IsGaussianPrime(5) = {Gint.IsGaussianPrime(new Gint(5))}");
+Console.WriteLine($"IsGaussianPrime(7) = {Gint.IsGaussianPrime(new Gint(7))}");
+Console.WriteLine($"IsGaussianPrime(2+i) = {Gint.IsGaussianPrime(new Gint(2, 1))}");
+Console.WriteLine($"IsGaussianPrime(1+i) = {Gint.IsGaussianPrime(new Gint(1, 1))}");
+Console.WriteLine();
 
+// Number theory
+Console.WriteLine("--- Number Theory ---");
+Console.WriteLine($"NumberTheory.IsPrime(17) = {NumberTheory.IsPrime(17)}");
+Console.WriteLine($"NumberTheory.IsPrime(15) = {NumberTheory.IsPrime(15)}");
+Console.WriteLine($"IsRelativelyPrime({alpha}, {beta}) = {Gint.IsRelativelyPrime(alpha, beta)}");
+var (isCong, cResult) = Gint.CongruentModulo(new Gint(7, 2), new Gint(3, 1), new Gint(2, 0));
+Console.WriteLine($"CongruentModulo(7+2i, 3+i, 2) = ({isCong}, {cResult})");
+var nd = Gint.NormsDivide(alpha, beta);
+Console.WriteLine($"NormsDivide({alpha}, {beta}) = {(nd.HasValue ? nd.Value.ToString() : "false")}");
+Console.WriteLine();
 
-Console.WriteLine(i++);
-Console.WriteLine(i++);
-Console.WriteLine(i++);
-Console.WriteLine(i++);
+// Conversion to Gauss
+Console.WriteLine("--- Conversion ---");
+Gauss alphaGauss = alpha;
+Console.WriteLine($"alpha as Gauss = {alphaGauss}");
+Console.WriteLine($"alpha as Gauss raw = {alphaGauss.ToRawString()}");
+Console.WriteLine();
 
-Gauss ni = new Gauss(0, 1, -1, 1);
+// FloorDiv
+Console.WriteLine("--- Floor Division ---");
+Console.WriteLine($"FloorDiv({alpha}, {beta}) = {Gint.FloorDiv(alpha, beta)}");
+Console.WriteLine();
 
-Console.WriteLine(ni);
+Console.WriteLine("=== Gauss (Gaussian Rational) New Features ===\n");
 
-Console.WriteLine("-i * -i = " + ni * ni);
+// Eye, Units, Associates
+Console.WriteLine("--- Eye, Units, Associates ---");
+Console.WriteLine($"Gauss.Eye() = {Gauss.Eye()}");
+Console.Write("Gauss.GaussUnits(): ");
+foreach (var u in Gauss.GaussUnits()) Console.Write($"{u}  ");
+Console.WriteLine();
 
+var gr = new Gauss(3, 1, 2, 1); // 3 + 2i
+Console.Write($"Associates of {gr}: ");
+foreach (var a in gr.Associates()) Console.Write($"{a}  ");
+Console.WriteLine();
+Console.WriteLine($"gr.IsAssociate(-gr) = {gr.IsAssociate(-gr)}");
+Console.WriteLine();
 
-//Gauss i = 1;
-//Gauss h = 100;
-//Console.WriteLine(i + h);
-//while (i <= h)
-//{
-//    Console.WriteLine(i);
-//    Gauss g = i;
-//    Console.WriteLine(g);
-//    i++;
-//}
+// Norm and Inverse
+Console.WriteLine("--- Norm & Inverse ---");
+Console.WriteLine($"({gr}).Norm = {gr.Norm}");
+Console.WriteLine($"({gr}).Inverse = {gr.Inverse}");
+Console.WriteLine($"({gr}) * ({gr}).Inverse = {gr * gr.Inverse}");
+Console.WriteLine();
 
+// Existing Gauss tests
+Console.WriteLine("--- Existing Gauss Arithmetic ---");
+Gauss i = Gauss.I;
+Console.WriteLine($"i * i = {i * i}");
+Console.WriteLine($"i = {i}");
 
+var a1 = new Gauss(3, 1, 2, 1);
+var b1 = new Gauss(1, 1, 4, 1);
+Console.WriteLine($"a = {a1}");
+Console.WriteLine($"b = {b1}");
+Console.WriteLine($"a + b = {a1 + b1}");
+Console.WriteLine($"a - b = {a1 - b1}");
+Console.WriteLine($"a * b = {a1 * b1}");
+Console.WriteLine($"a / b = {a1 / b1}");
+Console.WriteLine();
 
-//Console.WriteLine("=== Gauss Testing ===\n");
-
-//// Test integer casting
-//Console.WriteLine("--- Integer Casting ---");
-//Gauss one = 1;
-//Gauss five = 5;
-//Gauss negThree = -3;
-
-//Console.WriteLine($"1 -> {one.ToRawString()} -> \"{one}\"");
-//Console.WriteLine($"5 -> {five.ToRawString()} -> \"{five}\"");
-//Console.WriteLine($"-3 -> {negThree.ToRawString()} -> \"{negThree}\"");
-//Console.WriteLine();
-
-//// Test double/float casting
-//Console.WriteLine("--- Double/Float Casting ---");
-//Gauss half = 0.5;
-//Gauss quarter = 0.25;
-//Gauss third = 1.0 / 3.0;
-
-//Console.WriteLine($"0.5 -> {half.ToRawString()} -> \"{half}\"");
-//Console.WriteLine($"0.25 -> {quarter.ToRawString()} -> \"{quarter}\"");
-//Console.WriteLine($"1/3 -> {third.ToRawString()} -> \"{third}\"");
-//Console.WriteLine();
-
-//// Test complex numbers
-//Console.WriteLine("--- Complex Numbers ---");
-//var i = Gauss.I;
-//var onePlusI = new Gauss(1, 1, 1, 1);
-//var twoPlusTwoI = new Gauss(2, 1, 2, 1);
-//var halfPlusHalfI = new Gauss(1, 2, 1, 2);
-
-//Console.WriteLine($"i -> {i.ToRawString()} -> \"{i}\"");
-//Console.WriteLine($"1+i -> {onePlusI.ToRawString()} -> \"{onePlusI}\"");
-//Console.WriteLine($"2+2i -> {twoPlusTwoI.ToRawString()} -> \"{twoPlusTwoI}\"");
-//Console.WriteLine($"1/2+1/2i -> {halfPlusHalfI.ToRawString()} -> \"{halfPlusHalfI}\"");
-//Console.WriteLine();
-
-//// Test decimal form
-//Console.WriteLine("--- Decimal Form ---");
-//Console.WriteLine($"1/2 decimal: {half.ToDecimalString()}");
-//Console.WriteLine($"1/3 decimal: {third.ToDecimalString()}");
-//Console.WriteLine($"1/2+1/2i decimal: {halfPlusHalfI.ToDecimalString()}");
-//Console.WriteLine();
-
-//// Test PramanaId and URL
-//Console.WriteLine("--- PramanaId & URL ---");
-//Console.WriteLine($"1 PramanaId: {one.PramanaId}");
-//Console.WriteLine($"1 URL: {one.PramanaUrl}");
-//Console.WriteLine($"i PramanaId: {i.PramanaId}");
-//Console.WriteLine($"i URL: {i.PramanaUrl}");
-//Console.WriteLine($"1+i PramanaId: {onePlusI.PramanaId}");
-//Console.WriteLine();
-
-//// Test parsing
-//Console.WriteLine("--- Parsing ---");
-//var parsed = Gauss.Parse("1,1,0,1");
-//Console.WriteLine($"Parse(\"1,1,0,1\") -> {parsed.ToRawString()} -> \"{parsed}\"");
-//var parsed2 = Gauss.Parse("1,2,1,2");
-//Console.WriteLine($"Parse(\"1,2,1,2\") -> {parsed2.ToRawString()} -> \"{parsed2}\"");
-//Console.WriteLine();
-
-//// Test arithmetic
-//Console.WriteLine("--- Arithmetic ---");
-//var a = new Gauss(3, 1, 2, 1); // 3 + 2i
-//var b = new Gauss(1, 1, 4, 1); // 1 + 4i
-
-//Console.WriteLine($"a = {a}");
-//Console.WriteLine($"b = {b}");
-//Console.WriteLine($"a + b = {a + b}");
-//Console.WriteLine($"a - b = {a - b}");
-//Console.WriteLine($"a * b = {a * b}");
-//Console.WriteLine($"a / b = {a / b}");
-//Console.WriteLine($"-a = {-a}");
-//Console.WriteLine($"a.Conjugate = {a.Conjugate}");
-//Console.WriteLine();
-
-//// Test magnitude and polar
-//Console.WriteLine("--- Magnitude & Polar ---");
-//Console.WriteLine($"|{a}| = {a.Magnitude}");
-//Console.WriteLine($"|{a}|² = {a.MagnitudeSquared}");
-//var (mag, phase) = a.ToPolar();
-//Console.WriteLine($"Polar: ({mag}, {phase} rad)");
-//Console.WriteLine();
-
-//// Test explicit casting back to primitives
-//Console.WriteLine("--- Explicit Casting to Primitives ---");
-//Gauss intVal = 42;
-//Gauss ratVal = new Gauss(7, 2, 0, 1); // 7/2
-
-//Console.WriteLine($"{intVal} as int: {(int)intVal}");
-//Console.WriteLine($"{intVal} as long: {(long)intVal}");
-//Console.WriteLine($"{ratVal} as double: {(double)ratVal}");
-//Console.WriteLine($"{ratVal} as float: {(float)ratVal}");
-
-//// Casting to arrays
-//double[] arr = (double[])onePlusI;
-//Console.WriteLine($"{onePlusI} as double[]: [{arr[0]}, {arr[1]}]");
-
-//int[] intArr = (int[])twoPlusTwoI;
-//Console.WriteLine($"{twoPlusTwoI} as int[]: [{intArr[0]}, {intArr[1]}]");
-//Console.WriteLine();
-
-//// Test BigInteger support
-//Console.WriteLine("--- BigInteger Support ---");
-//BigInteger big = BigInteger.Pow(10, 50);
-//Gauss bigRat = big;
-//Console.WriteLine($"10^50 -> {bigRat.ToRawString()}");
-//Console.WriteLine($"IsInteger: {bigRat.IsInteger}");
-//Console.WriteLine();
-
-//// Test properties
-//Console.WriteLine("--- Properties ---");
-//Console.WriteLine($"1 IsReal: {one.IsReal}");
-//Console.WriteLine($"i IsReal: {i.IsReal}");
-//Console.WriteLine($"i IsPurelyImaginary: {i.IsPurelyImaginary}");
-//Console.WriteLine($"1 IsInteger: {one.IsInteger}");
-//Console.WriteLine($"1/2 IsInteger: {half.IsInteger}");
-//Console.WriteLine($"1+i IsGaussianInteger: {onePlusI.IsGaussianInteger}");
-//Console.WriteLine($"1/2+1/2i IsGaussianInteger: {halfPlusHalfI.IsGaussianInteger}");
-//Console.WriteLine();
-
-//// Test equality
-//Console.WriteLine("--- Equality ---");
-//Gauss a1 = 2;
-//Gauss a2 = new Gauss(4, 2, 0, 1); // 4/2 = 2
-//Console.WriteLine($"{a1.ToRawString()} == {a2.ToRawString()}: {a1 == a2}");
-//Console.WriteLine();
-
-//// Test exception handling
-//Console.WriteLine("--- Exception Handling ---");
-//try
-//{
-//    int badCast = (int)onePlusI; // Should throw - has imaginary part
-//}
-//catch (InvalidCastException ex)
-//{
-//    Console.WriteLine($"Casting 1+i to int: {ex.Message}");
-//}
-
-//try
-//{
-//    int badCast = (int)half; // Should throw - not an integer
-//}
-//catch (InvalidCastException ex)
-//{
-//    Console.WriteLine($"Casting 1/2 to int: {ex.Message}");
-//}
-
-//Console.WriteLine("\n=== Testing Complete ===");
+Console.WriteLine("=== All Tests Complete ===");
