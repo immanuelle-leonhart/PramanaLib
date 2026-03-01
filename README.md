@@ -275,7 +275,7 @@ This is the C# / .NET implementation. The same SDK specification is being implem
 |----------|-----------|---------|
 | C# / .NET | **pramana-dotnet-sdk** (this repo) | `Pramana.SDK` (NuGet) |
 | Python | [pramana-python-sdk](https://github.com/Emma-Leonhart/pramana-python-sdk) | `pramana-sdk` (PyPI) |
-| npm (TypeScript or JavaScript) | [pramana-npm-sdk](https://github.com/Emma-Leonhart/pramana-ts-sdk) | `@pramana/sdk` (npm) |
+| TypeScript / JavaScript | [pramana-npm-sdk](https://github.com/Emma-Leonhart/pramana-ts-sdk) | `@pramana/sdk` (npm) |
 | Java | [pramana-java-sdk](https://github.com/Emma-Leonhart/pramana-java-sdk) | `org.pramana:pramana-sdk` (Maven) |
 | Rust | [pramana-rust-sdk](https://github.com/Emma-Leonhart/pramana-rust-sdk) | `pramana-sdk` (crates.io) |
 | Go | [pramana-go-sdk](https://github.com/Emma-Leonhart/pramana-go-sdk) | `github.com/Emma-Leonhart/pramana-go-sdk` |
