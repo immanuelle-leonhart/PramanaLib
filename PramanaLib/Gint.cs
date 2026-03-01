@@ -89,28 +89,28 @@ public readonly struct Gint :
 
     /// <summary>
     /// Gets a deterministic UUID v5 that uniquely identifies this value.
-    /// Uses the same namespace and canonical form as <see cref="Gauss.PramanaId"/>,
+    /// Uses the same namespace and canonical form as <see cref="Gauss.PramanaGuid"/>,
     /// with denominators always equal to 1 (i.e. "Real,1,Imag,1").
     /// </summary>
-    public Guid PramanaId => Gauss.GenerateUuidV5(Gauss.PramanaNamespace, $"{Real},1,{Imag},1");
+    public Guid PramanaGuid => Gauss.GenerateUuidV5(Gauss.PramanaNamespace, $"{Real},1,{Imag},1");
 
     /// <summary>
-    /// Gets the canonical Pramana pseudo-class string for this Gaussian integer,
+    /// Gets the canonical Pramana pseudo-class identifier for this Gaussian integer,
     /// in the form <c>pra:num:x,1,y,1</c> (e.g. <c>"pra:num:3,1,2,1"</c> for 3+2i).
     /// </summary>
-    public string PramanaString => $"pra:num:{Real},1,{Imag},1";
+    public string PramanaId => $"pra:num:{Real},1,{Imag},1";
 
     /// <summary>
     /// Gets the Pramana entity URL using the hashed UUID v5 identifier, formed as
-    /// <c>https://pramana.dev/entity/{PramanaId}</c>.
+    /// <c>https://pramana.dev/entity/{PramanaGuid}</c>.
     /// </summary>
-    public string PramanaHashUrl => $"https://pramana.dev/entity/{PramanaId}";
+    public string PramanaHashUrl => $"https://pramana.dev/entity/{PramanaGuid}";
 
     /// <summary>
     /// Gets the Pramana entity URL using the non-hashed pseudo-class string, formed as
     /// <c>https://pramana.dev/entity/pra:num:x,1,y,1</c>.
     /// </summary>
-    public string PramanaUrl => $"https://pramana.dev/entity/{PramanaString}";
+    public string PramanaUrl => $"https://pramana.dev/entity/{PramanaId}";
 
     #endregion
 

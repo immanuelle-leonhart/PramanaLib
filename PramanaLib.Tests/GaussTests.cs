@@ -651,25 +651,25 @@ public class GaussTests
     #region Pramana Integration
 
     [Fact]
-    public void PramanaString_Format()
+    public void PramanaId_Format()
     {
-        Assert.Equal("pra:num:1,1,0,1", Gauss.One.PramanaString);
-        Assert.Equal("pra:num:3,1,2,1", new Gauss(3, 1, 2, 1).PramanaString);
-        Assert.Equal("pra:num:1,2,0,1", new Gauss(1, 2, 0, 1).PramanaString);
+        Assert.Equal("pra:num:1,1,0,1", Gauss.One.PramanaId);
+        Assert.Equal("pra:num:3,1,2,1", new Gauss(3, 1, 2, 1).PramanaId);
+        Assert.Equal("pra:num:1,2,0,1", new Gauss(1, 2, 0, 1).PramanaId);
     }
 
     [Fact]
-    public void PramanaId_Deterministic()
+    public void PramanaGuid_Deterministic()
     {
         var a = new Gauss(3, 1, 2, 1);
         var b = new Gauss(3, 1, 2, 1);
-        Assert.Equal(a.PramanaId, b.PramanaId);
+        Assert.Equal(a.PramanaGuid, b.PramanaGuid);
     }
 
     [Fact]
-    public void PramanaId_DifferentForDifferentValues()
+    public void PramanaGuid_DifferentForDifferentValues()
     {
-        Assert.NotEqual(Gauss.One.PramanaId, Gauss.Zero.PramanaId);
+        Assert.NotEqual(Gauss.One.PramanaGuid, Gauss.Zero.PramanaGuid);
     }
 
     [Fact]
@@ -682,7 +682,7 @@ public class GaussTests
     public void PramanaHashUrl_UsesUuid()
     {
         var g = Gauss.One;
-        Assert.Contains(g.PramanaId.ToString(), g.PramanaHashUrl);
+        Assert.Contains(g.PramanaGuid.ToString(), g.PramanaHashUrl);
     }
 
     #endregion

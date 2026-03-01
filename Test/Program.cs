@@ -141,11 +141,11 @@ Console.WriteLine("=== Pramana Serialization ===\n");
 var g1 = new Gauss(3, 1, 2, 1); // 3 + 2i
 var gi1 = new Gint(3, 2);       // 3 + 2i
 
-Console.WriteLine($"Gauss(3+2i).PramanaString = {g1.PramanaString}");
-Console.WriteLine($"Gint(3+2i).PramanaString  = {gi1.PramanaString}");
 Console.WriteLine($"Gauss(3+2i).PramanaId     = {g1.PramanaId}");
 Console.WriteLine($"Gint(3+2i).PramanaId      = {gi1.PramanaId}");
-Console.WriteLine($"IDs match: {g1.PramanaId == gi1.PramanaId}");
+Console.WriteLine($"Gauss(3+2i).PramanaGuid   = {g1.PramanaGuid}");
+Console.WriteLine($"Gint(3+2i).PramanaGuid    = {gi1.PramanaGuid}");
+Console.WriteLine($"GUIDs match: {g1.PramanaGuid == gi1.PramanaGuid}");
 Console.WriteLine($"Gauss(3+2i).PramanaUrl     = {g1.PramanaUrl}");
 Console.WriteLine($"Gauss(3+2i).PramanaHashUrl = {g1.PramanaHashUrl}");
 Console.WriteLine($"Gint(3+2i).PramanaUrl      = {gi1.PramanaUrl}");
@@ -153,12 +153,18 @@ Console.WriteLine($"Gint(3+2i).PramanaHashUrl  = {gi1.PramanaHashUrl}");
 Console.WriteLine();
 
 Gauss one = Gauss.One;
-Console.WriteLine($"Gauss.One.PramanaString   = {one.PramanaString}");
 Console.WriteLine($"Gauss.One.PramanaId       = {one.PramanaId}");
-Console.WriteLine($"Gauss(1/2).PramanaString  = {new Gauss(1, 2, 0, 1).PramanaString}");
+Console.WriteLine($"Gauss.One.PramanaGuid     = {one.PramanaGuid}");
+Console.WriteLine($"Gauss(1/2).PramanaId      = {new Gauss(1, 2, 0, 1).PramanaId}");
 Console.WriteLine($"Gauss(1/2).ToDecimalString() = {new Gauss(1, 2, 0, 1).ToDecimalString(4)}");
 Console.WriteLine();
 
 Console.WriteLine("=== All Tests Complete ===");
 
-PramanaLib.PramanaObject p = new PramanaLib.PramanaObject();
+var p = new PramanaObject();
+Console.WriteLine($"PramanaObject PramanaGuid = {p.PramanaGuid}");
+p.GenerateId();
+Console.WriteLine($"PramanaObject PramanaGuid (after GenerateId) = {p.PramanaGuid}");
+Console.WriteLine($"PramanaObject PramanaHashUrl = {p.PramanaHashUrl}");
+Console.WriteLine($"PramanaObject.ClassId = {PramanaObject.ClassId}");
+Console.WriteLine($"PramanaObject.RootId  = {PramanaObject.RootId}");

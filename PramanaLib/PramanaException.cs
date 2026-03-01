@@ -1,6 +1,11 @@
-﻿
+namespace PramanaLib;
+
+/// <summary>
+/// Exception thrown when a Pramana OGM constraint is violated,
+/// such as attempting to assign an ID to an object that already has one.
+/// </summary>
 [Serializable]
-internal class PramanaException : Exception
+public class PramanaException : Exception
 {
     public PramanaException()
     {

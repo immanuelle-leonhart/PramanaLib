@@ -547,26 +547,26 @@ public class GintTests
     #region Pramana Integration
 
     [Fact]
-    public void PramanaString_Format()
+    public void PramanaId_Format()
     {
-        Assert.Equal("pra:num:3,1,2,1", new Gint(3, 2).PramanaString);
-        Assert.Equal("pra:num:1,1,0,1", new Gint(1).PramanaString);
+        Assert.Equal("pra:num:3,1,2,1", new Gint(3, 2).PramanaId);
+        Assert.Equal("pra:num:1,1,0,1", new Gint(1).PramanaId);
     }
 
     [Fact]
-    public void PramanaId_MatchesGaussEquivalent()
+    public void PramanaGuid_MatchesGaussEquivalent()
     {
         var gint = new Gint(3, 2);
         var gauss = new Gauss(3, 1, 2, 1);
-        Assert.Equal(gauss.PramanaId, gint.PramanaId);
+        Assert.Equal(gauss.PramanaGuid, gint.PramanaGuid);
     }
 
     [Fact]
-    public void PramanaId_DeterministicForSameValue()
+    public void PramanaGuid_DeterministicForSameValue()
     {
         var a = new Gint(7, 3);
         var b = new Gint(7, 3);
-        Assert.Equal(a.PramanaId, b.PramanaId);
+        Assert.Equal(a.PramanaGuid, b.PramanaGuid);
     }
 
     [Fact]
@@ -580,7 +580,7 @@ public class GintTests
     public void PramanaHashUrl_UsesUuid()
     {
         var g = new Gint(3, 2);
-        Assert.Contains(g.PramanaId.ToString(), g.PramanaHashUrl);
+        Assert.Contains(g.PramanaGuid.ToString(), g.PramanaHashUrl);
         Assert.StartsWith("https://pramana.dev/entity/", g.PramanaHashUrl);
     }
 
