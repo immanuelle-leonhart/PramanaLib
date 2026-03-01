@@ -211,14 +211,30 @@ public readonly struct Gauss :
     }
 
     /// <summary>
-    /// Would return a decimal approximation, but is intentionally disabled because
-    /// decimal representation loses the exact rational precision this type guarantees.
+    /// Returns a decimal approximation string with the specified number of decimal places.
     /// </summary>
-    /// <param name="precision">Unused.</param>
-    /// <exception cref="NotSupportedException">Always thrown.</exception>
+    /// <param name="precision">The number of decimal places (default 15).</param>
+    /// <returns>
+    /// A decimal approximation such as <c>"1.5 + 0.333333333333333i"</c>.
+    /// </returns>
     public string ToDecimalString(int precision = 15)
     {
-        throw new NotSupportedException("ToDecimalString loses precision. Use ToString() for exact representation.");
+        double re = (double)A / (double)B;
+        double im = (double)C / (double)D;
+
+        string rePart = re.ToString($"F{precision}");
+        if (C == 0) return rePart;
+
+        string imAbs = Math.Abs(im).ToString($"F{precision}");
+        if (A == 0)
+        {
+            if (im < 0) return $"-{imAbs}i";
+            return $"{imAbs}i";
+        }
+
+        if (im < 0)
+            return $"{rePart} - {imAbs}i";
+        return $"{rePart} + {imAbs}i";
     }
 
     /// <summary>
@@ -643,26 +659,43 @@ public readonly struct Gauss :
     }
 
     /// <summary>
-    /// Gets the magnitude (|z|) as a double.
+    /// Gets the magnitude (|z|) as a double. This is an approximation — use
+    /// <see cref="MagnitudeSquared"/> for exact representation.
     /// </summary>
-    public double Magnitude => throw new NotSupportedException("Magnitude loses precision. Use MagnitudeSquared for exact representation.");
+    public double Magnitude => Math.Sqrt((double)A / (double)B * ((double)A / (double)B) + (double)C / (double)D * ((double)C / (double)D));
 
     /// <summary>
-    /// Gets the phase angle (argument) in radians.
+    /// Gets the phase angle (argument) in radians as a double approximation.
     /// </summary>
-    public double Phase => throw new NotSupportedException("Phase loses precision and cannot be exactly represented as a rational.");
+    public double Phase => Math.Atan2((double)C / (double)D, (double)A / (double)B);
 
     /// <summary>
-    /// Gets the polar form as (magnitude, phase).
+    /// Gets the polar form as (magnitude, phase) double approximations.
     /// </summary>
-    public (double Magnitude, double Phase) ToPolar() => throw new NotSupportedException("ToPolar loses precision. Polar form cannot be exactly represented as rationals.");
+    public (double Magnitude, double Phase) ToPolar() => (Magnitude, Phase);
 
     /// <summary>
-    /// Creates a Gauss from polar coordinates.
+    /// Creates a <see cref="Gauss"/> from polar coordinates (double approximation).
+    /// The resulting value is a rational approximation of the polar form.
     /// </summary>
     public static Gauss FromPolar(double magnitude, double phase)
     {
-        throw new NotSupportedException("FromPolar loses precision. Polar coordinates cannot be exactly converted to rationals.");
+        double re = magnitude * Math.Cos(phase);
+        double im = magnitude * Math.Sin(phase);
+        return FromDouble(re, im);
+    }
+
+    /// <summary>
+    /// Creates a new <see cref="Gauss"/> from double real and imaginary parts.
+    /// Both values are converted to their best rational approximation.
+    /// </summary>
+    /// <param name="real">The real part as a double.</param>
+    /// <param name="imaginary">The imaginary part as a double.</param>
+    public static Gauss FromDouble(double real, double imaginary)
+    {
+        var (rNum, rDen) = DoubleToFraction(real);
+        var (iNum, iDen) = DoubleToFraction(imaginary);
+        return new Gauss(rNum, rDen, iNum, iDen);
     }
 
     /// <summary>
@@ -1027,7 +1060,7 @@ public readonly struct Gauss :
         {
             "G" => ToString(),
             "R" => ToRawString(),
-            "D" or "F" => throw new NotSupportedException("Decimal format loses precision. Use 'G' for exact representation."),
+            "D" or "F" => ToDecimalString(),
             "I" => ToImproperFractionString(),
             _ => throw new FormatException($"The '{format}' format string is not supported.")
         };
